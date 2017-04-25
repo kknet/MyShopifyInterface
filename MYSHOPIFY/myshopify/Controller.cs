@@ -20,9 +20,9 @@ namespace myshopify
             Orders Response = JsonConvert.DeserializeObject<Orders>(json);
             List<Order> lista = new List<Order>();
             if(Opcion == "PENDIENTE")
-                lista = (from r in (Response.orders.OrderBy(o => o.order_number).ToList()) where Convert.ToInt64(r.id) == NumeroOrden select r).ToList();
+                lista = (from r in (Response.orders.OrderBy(o => o.order_number).ToList()) where Convert.ToInt64(r.order_number) == NumeroOrden select r).ToList();
             else
-                lista = (from r in (Response.orders.OrderBy(o => o.order_number).ToList()) where Convert.ToInt64(r.id) > NumeroOrden select r).ToList();
+                lista = (from r in (Response.orders.OrderBy(o => o.order_number).ToList()) where Convert.ToInt64(r.order_number) > NumeroOrden select r).ToList();
             List<ZIMAGINE> RegistrosSAP = new List<ZIMAGINE>();
             ZIMAGINE modelo;
             transactions_response _t = new transactions_response();
@@ -37,7 +37,8 @@ namespace myshopify
                     modelo.FEORD = Convert.ToDateTime(orden.created_at).ToString("yyyyMMdd");
                     modelo.HORDE = Convert.ToDateTime(orden.created_at).ToString("hhmmss");
                     modelo.ORDID = orden.order_number;
-                    modelo.POSNR = "" + (POSICION + 10);
+                    POSICION += 10;
+                    modelo.POSNR = "" + POSICION;
                     modelo.JOBID = orden.id;
                     modelo.TIEND = ConfigurationManager.AppSettings["Tienda"].ToString();
                     modelo.NUMTI = ConfigurationManager.AppSettings["NumeroTienda"].ToString();
@@ -45,7 +46,7 @@ namespace myshopify
                     modelo.PRVPU = item.price;
                     modelo.UNIVE = item.quantity;
                     modelo.TASIM = orden.tax_lines.Count > 0 ? orden.tax_lines[0].rate : "0";
-                    modelo.MONVE = orden.total_price;
+                    modelo.MONVE = item.price;
                     modelo.WAERK = orden.currency;
                     modelo.REFPA = _t.transactions.Count > 0 ? _t.transactions[0].authorization : "";
                     modelo.NOMEN = orden.customer.first_name + " " + orden.customer.last_name;
@@ -70,17 +71,16 @@ namespace myshopify
                     modelo.FEORD = Convert.ToDateTime(orden.created_at).ToString("yyyyMMdd");
                     modelo.HORDE = Convert.ToDateTime(orden.created_at).ToString("hhmmss");
                     modelo.ORDID = orden.order_number;
-                    modelo.POSNR = "" + (POSICION + 10);
+                    POSICION += 10;
+                    modelo.POSNR = "" + POSICION;
                     modelo.JOBID = orden.id;
                     modelo.TIEND = ConfigurationManager.AppSettings["Tienda"].ToString();
                     modelo.NUMTI = ConfigurationManager.AppSettings["NumeroTienda"].ToString();
-
                     modelo.DESPR = "N/A";
                     modelo.PRVPU = item.price;
                     modelo.UNIVE = "1";
-
                     modelo.TASIM = orden.tax_lines.Count > 0 ? orden.tax_lines[0].rate : "0";
-                    modelo.MONVE = orden.total_price;
+                    modelo.MONVE = item.price;
                     modelo.WAERK = orden.currency;
                     modelo.REFPA = _t.transactions.Count > 0 ? _t.transactions[0].authorization : "";
                     modelo.NOMEN = orden.customer.first_name + " " + orden.customer.last_name;
@@ -108,7 +108,6 @@ namespace myshopify
                 }
                 else
                 {
-                    Console.WriteLine("registro insertado");
                     NumeroRegistros++;
                 }
             }
