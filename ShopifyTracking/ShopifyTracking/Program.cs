@@ -14,9 +14,30 @@ namespace ShopifyTracking
     {
         static void Main(string[] args)
         {
-            string Response = POST(@"https://instax-mexico.myshopify.com/admin/orders/5145744705/fulfillments.json");
-            Console.WriteLine(Response);
-            Console.ReadKey();
+            try
+            {
+                FulfillmentRequest request = new FulfillmentRequest();
+                if (args.Length == 1)
+                {
+                    request.created_at = DateTime.Now.ToString("s", System.Globalization.CultureInfo.InvariantCulture);
+                    request.order_id = args[0].Split('|')[0];
+                    request.status = args[0].Split('|')[1].Replace('_', ' ');
+                    request.notify_customer = args[0].Split('|')[2] == "1" ? true : false;
+                    //request.JobStatusId = Convert.ToInt32(args[0].Split('|')[3]);
+                    request.tracking_number = args[0].Split('|')[3].Replace('_', ' ');
+                    request.tracking_company = args[0].Split('|')[4].Replace('_', ' ');
+                    string response = PostFulfillment(request);
+                    Console.WriteLine(response);
+                }
+                else
+                {
+                    Console.WriteLine("No se asignaron los parámetros correctamente");
+                }
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine(exc.Message);
+            }
         }
         public static string GET(string url)
         {
@@ -47,9 +68,9 @@ namespace ShopifyTracking
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static string POST(string url)
+        public static string PostFulfillment(FulfillmentRequest Request)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://instax-mexico.myshopify.com/admin/orders/" + Request.order_id + "/fulfillments.json");
             request.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["Api_username"].ToString(), ConfigurationManager.AppSettings["Api_password"].ToString());
             try
             {
@@ -63,14 +84,14 @@ namespace ShopifyTracking
                     {
                         fulfillment = new
                         {
-                            tracking_number = "123456789010",
-                            tracking_url = "http://fedex.com",
-                            notify_customer = true
+                            created_at = Request.created_at,
+                            status = Request.status,
+                            notify_customer = Request.notify_customer,
+                            tracking_number = Request.tracking_number,
+                            tracking_company = Request.tracking_company
                         }
                     });
                     streamWriter.Write(json);
-                    //string json = "{\"fulfillment\":\"{\"tracking_number\":\"123456789010\",\"tracking_url\":\"www.google.com\",\"tracking_company\":\"FedEx\",\"notify_customer\":\"true\"}\"}";
-                    //streamWriter.Write(json);
                     streamWriter.Flush();
                     streamWriter.Close();
                 }
