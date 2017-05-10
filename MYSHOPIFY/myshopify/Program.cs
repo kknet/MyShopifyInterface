@@ -10,10 +10,10 @@ namespace myshopify
             try
             {
                 Controller controlador = new Controller();
-                long ORDEN = Convert.ToInt64(args.Count() > 0 ? args[0].ToString() : "0");
+                long ORDEN = Convert.ToInt64(args.Count() > 0 ? args[0].ToString() : "-1");
                 string OPCION = args.Count() > 1 ? args[1] : "";
                 int NumeroRegistrosExtraidos = 0;
-                if (ORDEN > 0)
+                if (ORDEN >= 0)
                 {
                     if (OPCION == "PENDIENTE")
                     {

@@ -99,42 +99,41 @@ namespace myshopify
                         if (Convert.ToDecimal(modelo.MONVE) > 0)
                             RegistrosSAP.Add(modelo);
                 }
-                //foreach(var item in orden.discount_codes)
-                //{
-                //    modelo = new ZIMAGINE();
-                //    modelo.FEORD = Convert.ToDateTime(orden.created_at).ToString("yyyyMMdd");
-                //    modelo.HORDE = Convert.ToDateTime(orden.created_at).ToString("hhmmss");
-                //    modelo.ORDID = orden.order_number;
-                //    POSICION += 10;
-                //    modelo.POSNR = "" + POSICION;
-                //    modelo.JOBID = orden.id;
-                //    modelo.TIEND = ConfigurationManager.AppSettings["Tienda"].ToString();
-                //    modelo.NUMTI = ConfigurationManager.AppSettings["NumeroTienda"].ToString();
-                //    modelo.DESPR = item.code;
-                //    modelo.PRVPU = ""; //¿Qué va aquí?
-                //    modelo.UNIVE = "1";
-                //    modelo.TASIM = "0";
-                //    modelo.MONVE = "-" + item.amount; //Monto de venta negativo
-                //    modelo.WAERK = orden.currency;
-                //    modelo.REFPA = _t.transactions.Count > 0 ? _t.transactions[0].authorization : "";
-                //    modelo.NOMEN = orden.customer.first_name + " " + orden.customer.last_name;
-                //    modelo.NOMCT = orden.customer.first_name;
-                //    modelo.APECT = orden.customer.last_name;
-                //    modelo.DIREC = orden.shipping_address.address1;
-                //    modelo.DIRE1 = orden.shipping_address.address2;
-                //    modelo.SUBEN = orden.shipping_address.city;
-                //    modelo.EDOEN = orden.shipping_address.province;
-                //    modelo.PSTLZ = orden.shipping_address.zip;
-                //    modelo.PAISE = orden.shipping_address.country;
-                //    modelo.MAILC = orden.customer.email;
-                //    modelo.TELNU = orden.shipping_address.phone;
-                //    modelo.MATNR = ""; //Código de material ¿Cuál es?
-                //    if (modelo.MONVE != string.Empty)
-                //        if (Convert.ToDecimal(modelo.MONVE) > 0)
-                //            RegistrosSAP.Add(modelo);
-                //}
+                foreach (var item in orden.discount_codes)
+                {
+                    modelo = new ZIMAGINE();
+                    modelo.FEORD = Convert.ToDateTime(orden.created_at).ToString("yyyyMMdd");
+                    modelo.HORDE = Convert.ToDateTime(orden.created_at).ToString("hhmmss");
+                    modelo.ORDID = orden.order_number;
+                    POSICION += 10;
+                    modelo.POSNR = "" + POSICION;
+                    modelo.JOBID = orden.id;
+                    modelo.TIEND = ConfigurationManager.AppSettings["Tienda"].ToString();
+                    modelo.NUMTI = ConfigurationManager.AppSettings["NumeroTienda"].ToString();
+                    modelo.DESPR = item.code;
+                    modelo.PRVPU = item.amount; //¿Qué va aquí?
+                    modelo.UNIVE = "1";
+                    modelo.TASIM = "0";
+                    modelo.MONVE = "-" + item.amount; //Monto de venta negativo
+                    modelo.WAERK = orden.currency;
+                    modelo.REFPA = _t.transactions.Count > 0 ? _t.transactions[0].authorization : "";
+                    modelo.NOMEN = orden.customer.first_name + " " + orden.customer.last_name;
+                    modelo.NOMCT = orden.customer.first_name;
+                    modelo.APECT = orden.customer.last_name;
+                    modelo.DIREC = orden.shipping_address.address1;
+                    modelo.DIRE1 = orden.shipping_address.address2;
+                    modelo.SUBEN = orden.shipping_address.city;
+                    modelo.EDOEN = orden.shipping_address.province;
+                    modelo.PSTLZ = orden.shipping_address.zip;
+                    modelo.PAISE = orden.shipping_address.country;
+                    modelo.MAILC = orden.customer.email;
+                    modelo.TELNU = orden.shipping_address.phone;
+                    modelo.MATNR = ""; //Código de material ¿Cuál es?
+                    if (modelo.MONVE != string.Empty)
+                        RegistrosSAP.Add(modelo);
+                }
             }
-            foreach (var registro in RegistrosSAP)
+            foreach (var registro in  RegistrosSAP)
             {
                 if (!Sap.ZINSTAX(registro))
                 {
