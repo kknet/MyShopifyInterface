@@ -45,7 +45,7 @@ namespace myshopify
                     modelo.DESPR = item.name;
                     modelo.PRVPU = item.price;
                     modelo.UNIVE = item.quantity;
-                    modelo.TASIM = orden.tax_lines.Count > 0 ? orden.tax_lines[0].rate : "0";
+                    modelo.TASIM = orden.tax_lines.Count > 0 ? (Convert.ToDecimal(orden.tax_lines[0].rate) * 100).ToString() : "0";
                     modelo.MONVE = (Convert.ToDecimal(item.price) * Convert.ToDecimal(item.quantity)).ToString();
                     modelo.WAERK = orden.currency;
                     modelo.REFPA = _t.transactions.Count > 0 ? _t.transactions[0].authorization : "";
@@ -79,7 +79,7 @@ namespace myshopify
                     modelo.DESPR = "N/A";
                     modelo.PRVPU = item.price;
                     modelo.UNIVE = "1";
-                    modelo.TASIM = orden.tax_lines.Count > 0 ? orden.tax_lines[0].rate : "0";
+                    modelo.TASIM = orden.tax_lines.Count > 0 ? (Convert.ToDecimal(orden.tax_lines[0].rate) * 100).ToString() : "0";
                     modelo.MONVE = item.price;
                     modelo.WAERK = orden.currency;
                     modelo.REFPA = _t.transactions.Count > 0 ? _t.transactions[0].authorization : "";
