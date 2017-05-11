@@ -111,7 +111,7 @@ namespace myshopify
                     modelo.TIEND = ConfigurationManager.AppSettings["Tienda"].ToString();
                     modelo.NUMTI = ConfigurationManager.AppSettings["NumeroTienda"].ToString();
                     modelo.DESPR = item.code;
-                    modelo.PRVPU = item.amount; //¿Qué va aquí?
+                    modelo.PRVPU = item.amount;
                     modelo.UNIVE = "1";
                     modelo.TASIM = "0";
                     modelo.MONVE = "-" + item.amount; //Monto de venta negativo
@@ -128,7 +128,7 @@ namespace myshopify
                     modelo.PAISE = orden.shipping_address.country;
                     modelo.MAILC = orden.customer.email;
                     modelo.TELNU = orden.shipping_address.phone;
-                    modelo.MATNR = ""; //Código de material ¿Cuál es?
+                    modelo.MATNR = "949950010"; //Código de material para descuentos
                     if (modelo.MONVE != string.Empty)
                         RegistrosSAP.Add(modelo);
                 }
