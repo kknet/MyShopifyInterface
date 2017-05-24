@@ -90,6 +90,7 @@ namespace myshopify
                 Funcion.SetValue("MAILC", modelo.MAILC);
                 Funcion.SetValue("TELNU", modelo.TELNU);
                 Funcion.SetValue("MATNR", modelo.MATNR);
+                Funcion.SetValue("PROCO", modelo.PROCO);
                 Funcion.Invoke(rfc);
 
                 success = Funcion.GetString("bande") == "1" ? true : false;

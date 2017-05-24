@@ -128,6 +128,7 @@ namespace myshopify
                     modelo.PAISE = orden.shipping_address.country;
                     modelo.MAILC = orden.customer.email;
                     modelo.TELNU = orden.shipping_address.phone;
+                    modelo.PROCO = item.code;
                     modelo.MATNR = "949950010"; //Código de material para descuentos
                     if (modelo.MONVE != string.Empty)
                         RegistrosSAP.Add(modelo);
