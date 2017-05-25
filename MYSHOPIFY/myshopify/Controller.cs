@@ -15,14 +15,46 @@ namespace myshopify
     {
         public bool ExtraerRegistros(long NumeroOrden, string Opcion, ref int NumeroRegistros)
         {
-            NumeroRegistros = 0;
             string json = GET(ConfigurationManager.AppSettings["UrlOrdenes"].ToString());
             Orders Response = JsonConvert.DeserializeObject<Orders>(json);
             List<Order> lista = new List<Order>();
-            if(Opcion == "PENDIENTE")
+            if (Opcion == "PENDIENTE")
+            {
                 lista = (from r in (Response.orders.OrderBy(o => o.order_number).ToList()) where Convert.ToInt64(r.order_number) == NumeroOrden select r).ToList();
+                SendToSap(lista, ref NumeroRegistros);
+            }
             else
-                lista = (from r in (Response.orders.OrderBy(o => o.order_number).ToList()) where Convert.ToInt64(r.order_number) > NumeroOrden select r).ToList();
+            {
+                using (myshopifyInterfaceEntities db = new myshopifyInterfaceEntities())
+                {
+                    var q = (from o in Response.orders
+                             join l in db.ordenes on Convert.ToInt64(o.id) equals l.order_id into ls
+                             from l in ls.DefaultIfEmpty()
+                             where l == null
+                             select o).ToList();
+                    lista = q;
+                    ordenes _o;
+                    DateTime now = DateTime.Now;
+                    foreach (var elemento in lista)
+                    {
+                        _o = new ordenes();
+                        _o.datFechaEnviada = now;
+                        _o.order_id = Convert.ToInt64(elemento.id);
+                        db.ordenes.Add(_o);
+                    }
+                    SendToSap(lista, ref NumeroRegistros);
+                    db.SaveChanges();
+                }
+            }
+            return true;
+        }
+        /// <summary>
+        /// Envia las órdenes a sap
+        /// </summary>
+        /// <param name="lista"></param>
+        private void SendToSap(List<Order> lista, ref int NumeroRegistros)
+        {
+            NumeroRegistros = 0;
             List<ZIMAGINE> RegistrosSAP = new List<ZIMAGINE>();
             ZIMAGINE modelo;
             transactions_response _t = new transactions_response();
@@ -134,7 +166,7 @@ namespace myshopify
                         RegistrosSAP.Add(modelo);
                 }
             }
-            foreach (var registro in  RegistrosSAP)
+            foreach (var registro in RegistrosSAP)
             {
                 if (!Sap.ZINSTAX(registro))
                 {
@@ -145,7 +177,6 @@ namespace myshopify
                     NumeroRegistros++;
                 }
             }
-            return true;
         }
         /// <summary>
         /// Permite hacer un get al API de shopify

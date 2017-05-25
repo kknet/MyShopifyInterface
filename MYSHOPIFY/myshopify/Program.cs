@@ -37,7 +37,10 @@ namespace myshopify
                 }
                 else
                 {
-                    Console.WriteLine("La orden no fue introducida como parámetro");
+                    if (controlador.ExtraerRegistros(ORDEN, "MASIVA", ref NumeroRegistrosExtraidos))
+                    {
+                        Console.WriteLine("Se extrajeron " + NumeroRegistrosExtraidos + " registros");
+                    }
                 }
             }
             catch (Exception exc)
