@@ -26,5 +26,6 @@ namespace myshopify
         }
     
         public virtual DbSet<ordenes> ordenes { get; set; }
+        public virtual DbSet<tiendas> tiendas { get; set; }
     }
 }

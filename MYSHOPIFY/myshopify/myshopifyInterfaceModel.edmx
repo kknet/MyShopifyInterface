@@ -4,19 +4,48 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="myshopifyInterfaceModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="myshopifyInterfaceModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="ordenes">
           <Key>
             <PropertyRef Name="order_id" />
           </Key>
           <Property Name="order_id" Type="bigint" Nullable="false" />
           <Property Name="datFechaEnviada" Type="datetime" />
+          <Property Name="tienda_id" Type="varchar" MaxLength="50" />
         </EntityType>
+        <EntityType Name="tiendas">
+          <Key>
+            <PropertyRef Name="tienda_id" />
+          </Key>
+          <Property Name="tienda_id" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="vchNombreTienda" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="vchUrlOrdenes" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="vchUrlTransacciones" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="vchUsername" Type="varchar" MaxLength="500" Nullable="false" />
+          <Property Name="vchPassword" Type="varchar" MaxLength="500" Nullable="false" />
+          <Property Name="bitActiva" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__ordenes__tienda___1273C1CD">
+          <End Role="tiendas" Type="Self.tiendas" Multiplicity="0..1" />
+          <End Role="ordenes" Type="Self.ordenes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tiendas">
+              <PropertyRef Name="tienda_id" />
+            </Principal>
+            <Dependent Role="ordenes">
+              <PropertyRef Name="tienda_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="myshopifyInterfaceModelStoreContainer">
           <EntitySet Name="ordenes" EntityType="Self.ordenes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tiendas" EntityType="Self.tiendas" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__ordenes__tienda___1273C1CD" Association="Self.FK__ordenes__tienda___1273C1CD">
+            <End Role="tiendas" EntitySet="tiendas" />
+            <End Role="ordenes" EntitySet="ordenes" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="myshopifyInterfaceModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -26,10 +55,42 @@
           </Key>
           <Property Name="order_id" Type="Int64" Nullable="false" />
           <Property Name="datFechaEnviada" Type="DateTime" Precision="3" />
+          <Property Name="tienda_id" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tiendas" Relationship="myshopifyInterfaceModel.FK__ordenes__tienda___1273C1CD" FromRole="ordenes" ToRole="tiendas" />
         </EntityType>
         <EntityContainer Name="myshopifyInterfaceEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="ordenes" EntityType="Self.ordenes" />
+          <EntitySet Name="tiendas" EntityType="myshopifyInterfaceModel.tiendas" />
+          <AssociationSet Name="FK__ordenes__tienda___1273C1CD" Association="myshopifyInterfaceModel.FK__ordenes__tienda___1273C1CD">
+            <End Role="tiendas" EntitySet="tiendas" />
+            <End Role="ordenes" EntitySet="ordenes" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="tiendas">
+          <Key>
+            <PropertyRef Name="tienda_id" />
+          </Key>
+          <Property Name="tienda_id" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="vchNombreTienda" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="vchUrlOrdenes" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="vchUrlTransacciones" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="vchUsername" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="vchPassword" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="bitActiva" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="ordenes" Relationship="myshopifyInterfaceModel.FK__ordenes__tienda___1273C1CD" FromRole="tiendas" ToRole="ordenes" />
+        </EntityType>
+        <Association Name="FK__ordenes__tienda___1273C1CD">
+          <End Type="myshopifyInterfaceModel.tiendas" Role="tiendas" Multiplicity="0..1" />
+          <End Type="myshopifyInterfaceModel.ordenes" Role="ordenes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tiendas">
+              <PropertyRef Name="tienda_id" />
+            </Principal>
+            <Dependent Role="ordenes">
+              <PropertyRef Name="tienda_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -39,8 +100,22 @@
           <EntitySetMapping Name="ordenes">
             <EntityTypeMapping TypeName="myshopifyInterfaceModel.ordenes">
               <MappingFragment StoreEntitySet="ordenes">
+                <ScalarProperty Name="tienda_id" ColumnName="tienda_id" />
                 <ScalarProperty Name="order_id" ColumnName="order_id" />
                 <ScalarProperty Name="datFechaEnviada" ColumnName="datFechaEnviada" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tiendas">
+            <EntityTypeMapping TypeName="myshopifyInterfaceModel.tiendas">
+              <MappingFragment StoreEntitySet="tiendas">
+                <ScalarProperty Name="bitActiva" ColumnName="bitActiva" />
+                <ScalarProperty Name="vchPassword" ColumnName="vchPassword" />
+                <ScalarProperty Name="vchUsername" ColumnName="vchUsername" />
+                <ScalarProperty Name="vchUrlTransacciones" ColumnName="vchUrlTransacciones" />
+                <ScalarProperty Name="vchUrlOrdenes" ColumnName="vchUrlOrdenes" />
+                <ScalarProperty Name="vchNombreTienda" ColumnName="vchNombreTienda" />
+                <ScalarProperty Name="tienda_id" ColumnName="tienda_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

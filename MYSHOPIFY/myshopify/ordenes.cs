@@ -16,5 +16,8 @@ namespace myshopify
     {
         public long order_id { get; set; }
         public Nullable<System.DateTime> datFechaEnviada { get; set; }
+        public string tienda_id { get; set; }
+    
+        public virtual tiendas tiendas { get; set; }
     }
 }

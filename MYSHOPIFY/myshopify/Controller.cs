@@ -15,35 +15,40 @@ namespace myshopify
     {
         public bool ExtraerRegistros(long NumeroOrden, string Opcion, ref int NumeroRegistros)
         {
-            string json = GET(ConfigurationManager.AppSettings["UrlOrdenes"].ToString());
-            Orders Response = JsonConvert.DeserializeObject<Orders>(json);
-            List<Order> lista = new List<Order>();
-            if (Opcion == "PENDIENTE")
+            using (myshopifyInterfaceEntities db = new myshopifyInterfaceEntities())
             {
-                lista = (from r in (Response.orders.OrderBy(o => o.order_number).ToList()) where Convert.ToInt64(r.order_number) == NumeroOrden select r).ToList();
-                SendToSap(lista, ref NumeroRegistros);
-            }
-            else
-            {
-                using (myshopifyInterfaceEntities db = new myshopifyInterfaceEntities())
+                var Tiendas = (from t in db.tiendas where t.bitActiva select t).ToList();
+                foreach(var tienda in Tiendas)
                 {
-                    var q = (from o in Response.orders
-                             join l in db.ordenes on Convert.ToInt64(o.id) equals l.order_id into ls
-                             from l in ls.DefaultIfEmpty()
-                             where l == null
-                             select o).ToList();
-                    lista = q;
-                    ordenes _o;
-                    DateTime now = DateTime.Now;
-                    foreach (var elemento in lista)
+                    string json = GET(tienda.vchUrlOrdenes, tienda.vchUsername, tienda.vchPassword);
+                    Orders Response = JsonConvert.DeserializeObject<Orders>(json);
+                    List<Order> lista = new List<Order>();
+                    if (Opcion == "PENDIENTE")
                     {
-                        _o = new ordenes();
-                        _o.datFechaEnviada = now;
-                        _o.order_id = Convert.ToInt64(elemento.id);
-                        db.ordenes.Add(_o);
+                        lista = (from r in (Response.orders.OrderBy(o => o.order_number).ToList()) where Convert.ToInt64(r.order_number) == NumeroOrden select r).ToList();
+                        SendToSap(lista, tienda.vchUrlTransacciones, tienda.vchNombreTienda, tienda.tienda_id, ref NumeroRegistros);
                     }
-                    SendToSap(lista, ref NumeroRegistros);
-                    db.SaveChanges();
+                    else
+                    {
+                        var q = (from o in Response.orders
+                                 join l in db.ordenes on new { id = Convert.ToInt64(o.id), tienda_id = tienda.tienda_id } equals new { id = l.order_id,  tienda_id = l.tienda_id } into ls
+                                 from l in ls.DefaultIfEmpty()
+                                 where l == null
+                                 select o).ToList();
+                        lista = q;
+                        ordenes _o;
+                        DateTime now = DateTime.Now;
+                        foreach (var elemento in lista)
+                        {
+                            _o = new ordenes();
+                            _o.datFechaEnviada = now;
+                            _o.order_id = Convert.ToInt64(elemento.id);
+                            _o.tienda_id = tienda.tienda_id;
+                            db.ordenes.Add(_o);
+                        }
+                        SendToSap(lista, tienda.vchUrlTransacciones, tienda.vchNombreTienda, tienda.tienda_id, ref NumeroRegistros);
+                        db.SaveChanges();
+                    }
                 }
             }
             return true;
@@ -52,7 +57,7 @@ namespace myshopify
         /// Envia las órdenes a sap
         /// </summary>
         /// <param name="lista"></param>
-        private void SendToSap(List<Order> lista, ref int NumeroRegistros)
+        private void SendToSap(List<Order> lista, string url_transacciones, string Tienda, string NumeroTienda, ref int NumeroRegistros)
         {
             NumeroRegistros = 0;
             List<ZIMAGINE> RegistrosSAP = new List<ZIMAGINE>();
@@ -61,7 +66,7 @@ namespace myshopify
             int POSICION = 0;
             foreach (var orden in lista)
             {
-                _t = JsonConvert.DeserializeObject<transactions_response>(GET(ConfigurationManager.AppSettings["UrlTransacciones"].ToString().Replace("xxx", orden.id)));
+                _t = JsonConvert.DeserializeObject<transactions_response>(url_transacciones.Replace("xxx", orden.id));
                 POSICION = 0;
                 foreach (var item in orden.line_items)
                 {
@@ -72,8 +77,8 @@ namespace myshopify
                     POSICION += 10;
                     modelo.POSNR = "" + POSICION;
                     modelo.JOBID = orden.id;
-                    modelo.TIEND = ConfigurationManager.AppSettings["Tienda"].ToString();
-                    modelo.NUMTI = ConfigurationManager.AppSettings["NumeroTienda"].ToString();
+                    modelo.TIEND = Tienda;
+                    modelo.NUMTI = NumeroTienda;
                     modelo.DESPR = item.name;
                     modelo.PRVPU = item.price;
                     modelo.UNIVE = item.quantity;
@@ -106,8 +111,8 @@ namespace myshopify
                     POSICION += 10;
                     modelo.POSNR = "" + POSICION;
                     modelo.JOBID = orden.id;
-                    modelo.TIEND = ConfigurationManager.AppSettings["Tienda"].ToString();
-                    modelo.NUMTI = ConfigurationManager.AppSettings["NumeroTienda"].ToString();
+                    modelo.TIEND = Tienda;
+                    modelo.NUMTI = NumeroTienda;
                     modelo.DESPR = "N/A";
                     modelo.PRVPU = item.price;
                     modelo.UNIVE = "1";
@@ -140,8 +145,8 @@ namespace myshopify
                     POSICION += 10;
                     modelo.POSNR = "" + POSICION;
                     modelo.JOBID = orden.id;
-                    modelo.TIEND = ConfigurationManager.AppSettings["Tienda"].ToString();
-                    modelo.NUMTI = ConfigurationManager.AppSettings["NumeroTienda"].ToString();
+                    modelo.TIEND = Tienda;
+                    modelo.NUMTI = NumeroTienda;
                     modelo.DESPR = item.code;
                     modelo.PRVPU = item.amount;
                     modelo.UNIVE = "1";
@@ -183,10 +188,10 @@ namespace myshopify
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static string GET(string url)
+        public static string GET(string url, string username, string password)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["Api_username"].ToString(), ConfigurationManager.AppSettings["Api_password"].ToString());
+            request.Credentials = new NetworkCredential(username, password);
             try
             {
                 WebResponse response = request.GetResponse();
