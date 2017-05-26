@@ -26,7 +26,7 @@ namespace myshopify
                     if (Opcion == "PENDIENTE")
                     {
                         lista = (from r in (Response.orders.OrderBy(o => o.name).ToList()) where Convert.ToInt64(r.name) == NumeroOrden select r).ToList();
-                        SendToSap(lista, tienda.vchUrlTransacciones, tienda.vchNombreTienda, tienda.tienda_id, ref NumeroRegistros);
+                        SendToSap(lista, tienda.vchUrlTransacciones, tienda.vchNombreTienda, tienda.tienda_id, tienda.vchUsername, tienda.vchPassword, ref NumeroRegistros);
                     }
                     else
                     {
@@ -46,7 +46,7 @@ namespace myshopify
                             _o.tienda_id = tienda.tienda_id;
                             db.ordenes.Add(_o);
                         }
-                        SendToSap(lista, tienda.vchUrlTransacciones, tienda.vchNombreTienda, tienda.tienda_id, ref NumeroRegistros);
+                        SendToSap(lista, tienda.vchUrlTransacciones, tienda.vchNombreTienda, tienda.tienda_id, tienda.vchUsername, tienda.vchPassword, ref NumeroRegistros);
                         db.SaveChanges();
                     }
                 }
@@ -57,7 +57,7 @@ namespace myshopify
         /// Envia las órdenes a sap
         /// </summary>
         /// <param name="lista"></param>
-        private void SendToSap(List<Order> lista, string url_transacciones, string Tienda, string NumeroTienda, ref int NumeroRegistros)
+        private void SendToSap(List<Order> lista, string url_transacciones, string Tienda, string NumeroTienda, string username, string password, ref int NumeroRegistros)
         {
             NumeroRegistros = 0;
             List<ZIMAGINE> RegistrosSAP = new List<ZIMAGINE>();
@@ -66,7 +66,7 @@ namespace myshopify
             int POSICION = 0;
             foreach (var orden in lista)
             {
-                _t = JsonConvert.DeserializeObject<transactions_response>(url_transacciones.Replace("xxx", orden.id));
+                _t = JsonConvert.DeserializeObject<transactions_response>(GET(url_transacciones.Replace("xxx", orden.id),username, password));
                 POSICION = 0;
                 foreach (var item in orden.line_items)
                 {
