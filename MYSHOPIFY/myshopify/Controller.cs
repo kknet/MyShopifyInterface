@@ -25,7 +25,7 @@ namespace myshopify
                     List<Order> lista = new List<Order>();
                     if (Opcion == "PENDIENTE")
                     {
-                        lista = (from r in (Response.orders.OrderBy(o => o.order_number).ToList()) where Convert.ToInt64(r.order_number) == NumeroOrden select r).ToList();
+                        lista = (from r in (Response.orders.OrderBy(o => o.name).ToList()) where Convert.ToInt64(r.name) == NumeroOrden select r).ToList();
                         SendToSap(lista, tienda.vchUrlTransacciones, tienda.vchNombreTienda, tienda.tienda_id, ref NumeroRegistros);
                     }
                     else
@@ -73,7 +73,7 @@ namespace myshopify
                     modelo = new ZIMAGINE();
                     modelo.FEORD = Convert.ToDateTime(orden.created_at).ToString("yyyyMMdd");
                     modelo.HORDE = Convert.ToDateTime(orden.created_at).ToString("hhmmss");
-                    modelo.ORDID = orden.order_number;
+                    modelo.ORDID = orden.name;
                     POSICION += 10;
                     modelo.POSNR = "" + POSICION;
                     modelo.JOBID = orden.id;
@@ -107,7 +107,7 @@ namespace myshopify
                     modelo = new ZIMAGINE();
                     modelo.FEORD = Convert.ToDateTime(orden.created_at).ToString("yyyyMMdd");
                     modelo.HORDE = Convert.ToDateTime(orden.created_at).ToString("hhmmss");
-                    modelo.ORDID = orden.order_number;
+                    modelo.ORDID = orden.name;
                     POSICION += 10;
                     modelo.POSNR = "" + POSICION;
                     modelo.JOBID = orden.id;
@@ -141,7 +141,7 @@ namespace myshopify
                     modelo = new ZIMAGINE();
                     modelo.FEORD = Convert.ToDateTime(orden.created_at).ToString("yyyyMMdd");
                     modelo.HORDE = Convert.ToDateTime(orden.created_at).ToString("hhmmss");
-                    modelo.ORDID = orden.order_number;
+                    modelo.ORDID = orden.name;
                     POSICION += 10;
                     modelo.POSNR = "" + POSICION;
                     modelo.JOBID = orden.id;
