@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace myshopify
+namespace ShopifyTracking
 {
     using System;
     using System.Collections.Generic;

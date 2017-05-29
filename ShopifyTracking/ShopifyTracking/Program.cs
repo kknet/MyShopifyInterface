@@ -26,6 +26,7 @@ namespace ShopifyTracking
                     //request.JobStatusId = Convert.ToInt32(args[0].Split('|')[3]);
                     request.tracking_number = args[0].Split('|')[3].Replace('_', ' ');
                     request.tracking_company = args[0].Split('|')[4].Replace('_', ' ');
+                    request.Tienda = args[0].Split('|')[5];
                     string response = PostFulfillment(request);
                     Console.WriteLine(response);
                 }
@@ -39,30 +40,6 @@ namespace ShopifyTracking
                 Console.WriteLine(exc.Message);
             }
         }
-        public static string GET(string url)
-        {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["Api_username"].ToString(), ConfigurationManager.AppSettings["Api_password"].ToString());
-            try
-            {
-                WebResponse response = request.GetResponse();
-                using (Stream responseStream = response.GetResponseStream())
-                {
-                    StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
-                    return reader.ReadToEnd();
-                }
-            }
-            catch (WebException ex)
-            {
-                WebResponse errorResponse = ex.Response;
-                using (Stream responseStream = errorResponse.GetResponseStream())
-                {
-                    StreamReader reader = new StreamReader(responseStream, Encoding.GetEncoding("utf-8"));
-                    string errorText = reader.ReadToEnd();
-                }
-                throw;
-            }
-        }
         /// <summary>
         /// Allows to send post messages to shopify
         /// </summary>
@@ -70,8 +47,23 @@ namespace ShopifyTracking
         /// <returns></returns>
         public static string PostFulfillment(FulfillmentRequest Request)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://instax-mexico.myshopify.com/admin/orders/" + Request.order_id + "/fulfillments.json");
-            request.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["Api_username"].ToString(), ConfigurationManager.AppSettings["Api_password"].ToString());
+            var urlTracking = string.Empty;
+            string username = string.Empty;
+            string password = string.Empty;
+            using (myshopifyInterfaceEntities db = new myshopifyInterfaceEntities())
+            {
+                if (db.tiendas.Any(i => i.tienda_id == Request.Tienda && i.bitActiva))
+                {
+                    var obj = db.tiendas.First(i => i.tienda_id == Request.Tienda);
+                    urlTracking = obj.vchUrlTracking;
+                    username = obj.vchUsername;
+                    password = obj.vchPassword;
+                }
+                else
+                    return "No existe la tienda: " + Request.Tienda;
+            }
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlTracking.Replace("xxx", Request.order_id));
+            request.Credentials = new NetworkCredential(username, password);
             try
             {
                 request.Method = "POST";

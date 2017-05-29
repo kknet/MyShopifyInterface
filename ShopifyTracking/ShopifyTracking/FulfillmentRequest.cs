@@ -8,6 +8,7 @@ namespace ShopifyTracking
 {
     public class FulfillmentRequest
     {
+        public string Tienda { get; set; } = string.Empty;
         /// <summary>
         /// The date and time when the fulfillment was created. The API returns this value in ISO 8601 format.
         /// </summary>

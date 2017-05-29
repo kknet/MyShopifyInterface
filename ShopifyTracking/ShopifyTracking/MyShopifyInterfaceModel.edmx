@@ -57,33 +57,25 @@
           <Property Name="order_id" Type="Int64" Nullable="false" />
           <Property Name="datFechaEnviada" Type="DateTime" Precision="3" />
           <Property Name="tienda_id" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="tiendas" Relationship="myshopifyInterfaceModel.FK__ordenes__tienda___1273C1CD" FromRole="ordenes" ToRole="tiendas" />
+          <NavigationProperty Name="tiendas" Relationship="Self.FK__ordenes__tienda___1273C1CD" FromRole="ordenes" ToRole="tiendas" />
         </EntityType>
-        <EntityContainer Name="myshopifyInterfaceEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="ordenes" EntityType="Self.ordenes" />
-          <EntitySet Name="tiendas" EntityType="myshopifyInterfaceModel.tiendas" />
-          <AssociationSet Name="FK__ordenes__tienda___1273C1CD" Association="myshopifyInterfaceModel.FK__ordenes__tienda___1273C1CD">
-            <End Role="tiendas" EntitySet="tiendas" />
-            <End Role="ordenes" EntitySet="ordenes" />
-          </AssociationSet>
-        </EntityContainer>
         <EntityType Name="tiendas">
           <Key>
             <PropertyRef Name="tienda_id" />
           </Key>
-          <Property Name="tienda_id" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="vchNombreTienda" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="vchUrlOrdenes" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="vchUrlTransacciones" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="vchUsername" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="vchPassword" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="tienda_id" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="vchNombreTienda" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="vchUrlOrdenes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="vchUrlTransacciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="vchUsername" Type="String" MaxLength="500" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="vchPassword" Type="String" MaxLength="500" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="bitActiva" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="ordenes" Relationship="myshopifyInterfaceModel.FK__ordenes__tienda___1273C1CD" FromRole="tiendas" ToRole="ordenes" />
+          <NavigationProperty Name="ordenes" Relationship="Self.FK__ordenes__tienda___1273C1CD" FromRole="tiendas" ToRole="ordenes" />
           <Property Name="vchUrlTracking" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK__ordenes__tienda___1273C1CD">
-          <End Type="myshopifyInterfaceModel.tiendas" Role="tiendas" Multiplicity="0..1" />
-          <End Type="myshopifyInterfaceModel.ordenes" Role="ordenes" Multiplicity="*" />
+          <End Role="tiendas" Type="Self.tiendas" Multiplicity="0..1" />
+          <End Role="ordenes" Type="Self.ordenes" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="tiendas">
               <PropertyRef Name="tienda_id" />
@@ -93,6 +85,14 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityContainer Name="myshopifyInterfaceEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ordenes" EntityType="Self.ordenes" />
+          <EntitySet Name="tiendas" EntityType="Self.tiendas" />
+          <AssociationSet Name="FK__ordenes__tienda___1273C1CD" Association="Self.FK__ordenes__tienda___1273C1CD">
+            <End Role="tiendas" EntitySet="tiendas" />
+            <End Role="ordenes" EntitySet="ordenes" />
+          </AssociationSet>
+        </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -102,9 +102,9 @@
           <EntitySetMapping Name="ordenes">
             <EntityTypeMapping TypeName="myshopifyInterfaceModel.ordenes">
               <MappingFragment StoreEntitySet="ordenes">
-                <ScalarProperty Name="tienda_id" ColumnName="tienda_id" />
                 <ScalarProperty Name="order_id" ColumnName="order_id" />
                 <ScalarProperty Name="datFechaEnviada" ColumnName="datFechaEnviada" />
+                <ScalarProperty Name="tienda_id" ColumnName="tienda_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -112,13 +112,13 @@
             <EntityTypeMapping TypeName="myshopifyInterfaceModel.tiendas">
               <MappingFragment StoreEntitySet="tiendas">
                 <ScalarProperty Name="vchUrlTracking" ColumnName="vchUrlTracking" />
-                <ScalarProperty Name="bitActiva" ColumnName="bitActiva" />
-                <ScalarProperty Name="vchPassword" ColumnName="vchPassword" />
-                <ScalarProperty Name="vchUsername" ColumnName="vchUsername" />
-                <ScalarProperty Name="vchUrlTransacciones" ColumnName="vchUrlTransacciones" />
-                <ScalarProperty Name="vchUrlOrdenes" ColumnName="vchUrlOrdenes" />
-                <ScalarProperty Name="vchNombreTienda" ColumnName="vchNombreTienda" />
                 <ScalarProperty Name="tienda_id" ColumnName="tienda_id" />
+                <ScalarProperty Name="vchNombreTienda" ColumnName="vchNombreTienda" />
+                <ScalarProperty Name="vchUrlOrdenes" ColumnName="vchUrlOrdenes" />
+                <ScalarProperty Name="vchUrlTransacciones" ColumnName="vchUrlTransacciones" />
+                <ScalarProperty Name="vchUsername" ColumnName="vchUsername" />
+                <ScalarProperty Name="vchPassword" ColumnName="vchPassword" />
+                <ScalarProperty Name="bitActiva" ColumnName="bitActiva" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
