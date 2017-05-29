@@ -52,9 +52,10 @@ namespace ShopifyTracking
             string password = string.Empty;
             using (myshopifyInterfaceEntities db = new myshopifyInterfaceEntities())
             {
-                if (db.tiendas.Any(i => i.tienda_id == Request.Tienda && i.bitActiva))
+                string tienda_id = Convert.ToString(Convert.ToInt32(Request.Tienda));
+                if (db.tiendas.Any(i => i.tienda_id == tienda_id && i.bitActiva))
                 {
-                    var obj = db.tiendas.First(i => i.tienda_id == Request.Tienda);
+                    var obj = db.tiendas.First(i => i.tienda_id == tienda_id);
                     urlTracking = obj.vchUrlTracking;
                     username = obj.vchUsername;
                     password = obj.vchPassword;
