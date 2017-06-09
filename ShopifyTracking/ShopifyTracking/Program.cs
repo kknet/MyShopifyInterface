@@ -50,6 +50,10 @@ namespace ShopifyTracking
             var urlTracking = string.Empty;
             string username = string.Empty;
             string password = string.Empty;
+            if(Request.tracking_company.ToUpper().Contains("FEDEX"))
+            {
+                Request.tracking_company = "FedEx";
+            }
             using (myshopifyInterfaceEntities db = new myshopifyInterfaceEntities())
             {
                 string tienda_id = Convert.ToString(Convert.ToInt32(Request.Tienda));
